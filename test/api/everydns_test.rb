@@ -1,5 +1,4 @@
 require 'test_helper'
-require 'everydns'
 
 USERNAME = 'rb_client'
 PASSWORD = 'rb_client_test'
@@ -23,7 +22,16 @@ class EveryDNSTest < Test::Unit::TestCase
   
   def test_list_domains
     client = default_client
-    assert_equal ['somewhere.com'], client.list_domains
+    assert client.
+            list_domains.collect {|domain| domain.host }.
+              include?('somewhere.com')
+  end
+  
+  def test_session_timeout
+    client = default_client
+    assert_equal client.login, client.login
+    client.login
+    assert_equal 2, client.request_count
   end
   
   protected

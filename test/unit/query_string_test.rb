@@ -1,9 +1,9 @@
-require File.expand_path(File.join(File.dirname(__FILE__), 'test_helper'))
-require File.expand_path(File.join(File.dirname(__FILE__), '../lib/everydns'))
+require 'test_helper'
 
 class QueryStringTest < Test::Unit::TestCase
 
   def test_string
+    assert_equal 'test', 'test'.to_query_string
     assert_equal 'test=test', "test".to_query_string('test')
   end
   
