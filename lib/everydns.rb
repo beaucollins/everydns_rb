@@ -1,3 +1,5 @@
+# Manage EveryDNS domains and dns records through a ruby api by pretending
+# to be a user using the browser
 module EveryDNS
   
   EVERYDNS_HOSTNAME = 'www.everydns.com'
@@ -6,6 +8,8 @@ module EveryDNS
   
   class LoginFailed < StandardError; end;
   
+  # The main interface for managing EveryDNS domains. Provide your
+  # username and password to the client then perform desired rquests.
   class Client
     
     require 'net/http'
@@ -22,6 +26,9 @@ module EveryDNS
       @cookie_store = Cookies::Store.new
     end
     
+    # Send username/password as post data to correct url and parse
+    # response for success string. Stores the PHP session cookie so
+    # subsequent requests do not need to be logged in
     def login
       res = post '/account.php', "action=login&username=#{@username}&password=#{@password}"
       res = get(URI.join("http://#{EVERYDNS_HOSTNAME}", '/account.php', res['location']).to_s)
@@ -33,20 +40,42 @@ module EveryDNS
       self.authenticated?
     end
     
+    # If the current session has logged in successfully yet
     def authenticated?
       @authenticated
     end
     
+    # Returns an array of EveryDNS::Domain objects
     def list_domains
       login
       res = get '/manage.php'
       Domain.parse_list(res.body)
     end
     
+    # Add a host as a domain managed by EveryDNS. Options:
+    #   *:secondary
+    #   *:dynamic
+    #   *:webhop
+    def add_domain(host, options={})
+      options = options.merge({
+        :secondary => nil,
+        :dynamic => false,
+        :webhop => nil
+      })
+      
+      post_data = {}
+      
+      domain = Domain.new(host, nil, options)
+      self.post '/dns.php', {
+        'action' => ''
+      }.merge(domain.to_post_data)
+      
+    end
+    
     private
     
       def post path, data
-        update_cookies(http_client.post(path, data, prepare_headers))
+        update_cookies(http_client.post(path, data.to_query_string, prepare_headers))
       end
       
       def get path, data=nil
@@ -81,7 +110,7 @@ module EveryDNS
     
     attr_accessor :host, :id
     
-    def initialize(host, id)
+    def initialize(host, id, options={})
       @host, @id = host, id
     end
     
@@ -137,4 +166,26 @@ module EveryDNS
     
   end
   
+end
+
+class String
+  def to_query_string(scope='')
+    "#{scope}=#{self.to_s}"
+  end
+end
+
+class Array
+  def to_query_string(scope='')
+    self.collect { |item|
+      item.to_query_string("#{scope}[]")
+    }.join('&')
+  end
+end
+
+class Hash
+  def to_query_string(scope='')
+    self.collect { |key, value|
+      value.to_query_string(scope.empty? ? key : "#{scope}[#{key}]")
+    }.join("&")
+  end
 end
