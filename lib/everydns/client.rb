@@ -6,7 +6,7 @@ module EveryDNS
   # The main interface for managing EveryDNS domains. Provide your
   # username and password to the client then perform desired rquests.
   class Client
-    
+    require 'base64'
     require 'net/http'
     require 'uri'
     
@@ -16,7 +16,7 @@ module EveryDNS
       @username = username
       @password = password
       @last_login = nil
-      @domains = nil
+      @domain_list = nil
       @records = nil
       @request_count = 0
       @http_client
@@ -28,19 +28,18 @@ module EveryDNS
     # subsequent requests do not need to be logged in
     def login
       return @last_login if !@last_login.nil? && @last_login < @last_login + SESSION_TIMEOUT
-      res = post '/account.php', {
+      response = post '/account.php', {
         'action' => 'login',
         'username' => @username,
         'password' => @password
       }
-      res = get(URI.join("http://#{EVERYDNS_HOSTNAME}", '/account.php', res['location']).to_s)
-      if res.body =~ %r{Status: <b>Logged in</b> -- Welcome to Everydns.net}
+      if response_status_message(response) != 'Login failed, try again!'
         @last_login = Time.now
         @authenticated = true
         return @last_login
       else
+        @last_login = nil
         @authenticated = false
-        return false
       end
     end
     
@@ -54,11 +53,11 @@ module EveryDNS
       @authenticated
     end
     
-    # Returns an array of EveryDNS::Domain objects
+    # Returns an EveryDNS::DomainList
     def list_domains
       login!
       res = get '/manage.php'
-      Domain.parse_list(res.body)
+      @domain_list = DomainList.parse_list(res.body)
     end
     
     # Add a host as a domain managed by EveryDNS. Options:
@@ -66,16 +65,24 @@ module EveryDNS
     #   *:dynamic
     #   *:webhop
     def add_domain(host, type = :primary, option=nil)
-            
+      login!
       domain = Domain.new(host, nil, type, option)
-      self.post '/dns.php', {
+      res = post '/dns.php', {
         'action' => 'addDomain'
       }.merge(domain.create_options)
-      
+      res
+    end
+    
+    def response_status_message(http_response)
+      return false unless http_response.is_a?(Net::HTTPRedirection)
+      query = URI.parse(http_response['location']).query
+      return false if query.nil?
+      msg = Base64.decode64(query.decode_query_string['msg'])
+      return msg
     end
     
     private
-    
+      
       def post path, data
         @request_count += 1
         update_cookies(http_client.post(path, data.to_query_string, prepare_headers))

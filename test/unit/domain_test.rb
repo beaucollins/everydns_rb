@@ -2,17 +2,7 @@ require 'test_helper'
 
 class DomainTest < TestCase
   include EveryDNS
-  
-  DOMAINS = [
-    'somewhere.com',
-    'somewhere2.com',
-    'secondarydomain.com',
-    'secondarydomain2.com',
-    'dynamicdomain.com',
-    'webhopdomain.com',
-    'webhopdomain2.com'
-    ]
-  
+    
   def test_primary_domain
     domain = Domain.new('www.google.com')
     assert_equal domain.host, 'www.google.com'
@@ -47,11 +37,6 @@ class DomainTest < TestCase
       'sec' => 'webhop',
       'hop' => 'http://www.geocities.com/name'
     }, domain.create_options)
-  end
-  
-  def test_parse_domains
-    domains = Domain.parse_list(File.read('test/fixtures/manage.txt'))
-    assert_equal DOMAINS, domains.collect(&:host)
   end
   
 end
