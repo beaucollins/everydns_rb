@@ -11,7 +11,7 @@ class DomainListTest < TestCase
       
   def test_parse_domains
     
-    domain_list = EveryDNS::DomainList.parse_list(File.read('test/fixtures/manage.txt'))
+    domain_list = EveryDNS::DomainList.parse_list(File.read('test/fixtures/manage.html'))
     assert_equal DOMAINS.inject([]){|memo, pair| memo + pair.last }.sort, domain_list.collect(&:host).sort
     DOMAINS.each do |key, value|
       assert_equal value, domain_list.send(key).collect(&:host)

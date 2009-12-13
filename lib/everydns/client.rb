@@ -2,6 +2,8 @@ require 'everydns/cookies'
 module EveryDNS
 
   class LoginFailed < StandardError; end;
+  class MissingDomainError < StandardError; end;
+  class IncorrectDomainType < StandardError; end;
   
   RESPONSE_MESSAGES = {
     :LOGIN_FAILED => 'Login failed, try again!',
@@ -10,7 +12,8 @@ module EveryDNS
     :DOMAIN_ADDED_SECONDARY => '%s has been added to the database as secondary with \'%s\' as nameserver.',
     :DOMAIN_ADDED_WEBHOP => '%s has been added to the database as webhop.',
     :DOMAIN_DELETED => 'Domain %s has been deleted.',
-    :DOMAIN_EXISTS => '%s already exists in database.'
+    :DOMAIN_EXISTS => '%s already exists in database.',
+    :RECORD_DELETED => "Record Delete Succeeded"
   }
   
   # The main interface for managing EveryDNS domains. Provide your
@@ -102,6 +105,14 @@ module EveryDNS
         return false
       end
     end
+    
+    def list_records(host)
+      domain = domains[host]
+      raise MissingDomainError, "Domain #{host} does not exist" if domain.nil?
+      raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
+      
+    end
+    
     
     def domains
       @domain_list ||= DomainList.new

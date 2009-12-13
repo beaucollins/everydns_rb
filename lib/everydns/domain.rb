@@ -17,7 +17,11 @@ module EveryDNS
     VALID_TYPES.each do |type|
       define_method("#{type}?") { @type == type }
     end
-  
+    
+    def can_have_records?
+      [:primary, :dynamic].include? self.type
+    end
+    
     def new?
       id.nil?
     end
