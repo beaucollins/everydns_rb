@@ -34,7 +34,7 @@ module EveryDNS
       end
       
       def self.parse(cookie_string)
-        pair = cookie_string.split(';').first.strip.split('=');
+        pair = cookie_string.split(';').first.strip.split('=', 2);
         self.new(pair.first, pair.last)
       end
             
