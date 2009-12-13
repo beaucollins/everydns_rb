@@ -1,0 +1,177 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>Free DNS, Static DNS, Dynamic DNS, URL Redirection, and more from EveryDNS!</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <META NAME="Description" CONTENT="EveryDNS.Net provides free DNS and backup MX services.  This includes Static DNS, Dynamic DNS and URL Redirection!">
+    <meta name="keywords" content="free dns, static dns, secondary dns, primary dns, free, dynamic dns, mx, tinydns, djbdns, network services, free static dns, web redirection, free URL redirection, url, cloaking, dyndns">
+    <script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-300570-1");
+pageTracker._trackPageview();
+</script>
+  </head>
+  <body bgcolor="#FFFFFF" text="#000000" link="#000000" vlink="#000000" alink="#FFFFFF">
+    <table width="100%" border="0" cellspacing="0" cellpadding="0" align="center">
+      <tr> 
+        <td width="56%"> <a href="./index.php"><img src="images/main.gif" width="450" height="101" align="left" border="0" alt="EveryDNS.net - DNS for the rest of us."></a> 
+        </td>
+        <td bgcolor="#CCCCCC" width="1%" align="left" valign="bottom"><img src="images/spacer.gif" width="2" height="2" alt=""></td>
+        <td bgcolor="#CCCCCC" width="43%" align="left" valign="top"> 
+          <table width="100%" border="0" cellspacing="0" cellpadding="1">
+            <tr> 
+              <td><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b><i>Global 
+                Stats:</i></b></font></td>
+              <td bgcolor="#999999"><font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b><i>Your 
+                Stats: </i></b></font></td>
+            </tr>
+            <tr> 
+              <td valign="top"> <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Accounts: 
+                <font color="#FF0000">240863</font> </b></font><BR>
+                <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Domains: 
+                <font color="#FF0000">385639</font> </b></font><BR>
+                <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Records: 
+                <font color="#FF0000">1337608</font> </b></font><BR>
+              </td>
+              <td valign="top" bgcolor="#999999"> <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Domains: 
+                <font color="#FF0000">8<font color="#000000">/<font color="#FF0000">20</font></font></font></b></font><BR>
+                <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Records: 
+                <font color="#FF0000">10<font color="#000000">/<font color="#FF0000">200</font></font></font></b></font><BR>
+                <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Points: 
+                <font color="#FF0000">0</font></b></font><BR>
+                <font face="Verdana, Arial, Helvetica, sans-serif" size="2"><b>Penalties: 
+                <font color="#FF0000">0</font></b></font><BR>
+              </td>
+            </tr>
+           </table>
+           <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+Status: <b>Logged in</b> -- Welcome to Everydns.net           </font></td>
+         </tr>
+       </table>
+       <table width="100%" border="0" cellspacing="0" cellpadding="2" bgcolor="#ABCDEF">
+         <tr> 
+           <td>
+            <font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+            Currently: <B>HOME</B>&nbsp;&nbsp;<b>.::.</b>&nbsp;
+            <a href="./index.php">Home</a>&nbsp;&nbsp;::&nbsp;
+                        <a href="/manage.php">Manage DNS</a>&nbsp;&nbsp;::&nbsp;
+            <a href="/profile.php">Profile</a>&nbsp;&nbsp;::&nbsp;
+            <a href="/destroy.php">Logout</a>
+                        </font>
+          </td>
+        </tr>
+      </table>
+      <BR>
+
+<table width="95%" border="0" cellspacing="0" cellpadding="4" align="center">
+  <tr>
+    <td width="30%" valign="top">
+      <table width="100%" border="0" cellspacing="0" cellpadding="1" bgcolor="#000000" align="left">
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="2" cellpadding="1" bgcolor="#FFFFFF" height="100%">
+              <tr height="100%">
+                <td bgcolor="#FFFFFF" valign="top"> <b><font face="Verdana, Arial, Helvetica, sans-serif" size="2">Primary Domains:</font></b><BR>
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2">1.
+<a href="./dns.php?action=editDomain&did=1045096">somecrazydomain.name</a>&nbsp;[<a href="http://somecrazydomain.name" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1045096"><B>X</B></a>]<BR><font face="Verdana, Arial, Helvetica, sans-serif" size="2">2.
+<a href="./dns.php?action=editDomain&did=1043529">somewhere.com</a>&nbsp;[<a href="http://somewhere.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1043529"><B>X</B></a>]<BR><font face="Verdana, Arial, Helvetica, sans-serif" size="2">3.
+<a href="./dns.php?action=editDomain&did=1044164">somewhere2.com</a>&nbsp;[<a href="http://somewhere2.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1044164"><B>X</B></a>]<BR><hr align="center" width="80%">
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><B>Secondary Domains:</b></font><BR><font face="Verdana, Arial, Helvetica, sans-serif" size="2">4.
+secondarydomain.com <b>(</b>primarydomain.com<b>)</b> [<a href="http://secondarydomain.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1044140&t=sec"><B>X</B></a>]<BR><font face="Verdana, Arial, Helvetica, sans-serif" size="2">5.
+secondarydomain2.com <b>(</b>primarydomain.com<b>)</b> [<a href="http://secondarydomain2.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1044165&t=sec"><B>X</B></a>]<BR><hr align="center" width="80%">
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><B>Dynamic Domains:</b></font><BR><font face="Verdana, Arial, Helvetica, sans-serif" size="2">6.
+<a href='dns.php?action=editDynamic&dynid=114471'>dynamicdomain.com</a>&nbsp;[<a href="http://dynamicdomain.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&dynid=114471&t=dyn"><B>X</B></a>]<BR><BR>
+<font face="Verdana, Arial, Helvetica, sans-serif" size="1">
+You must use a <a href="./dynamic.php">client</a> to update the IP for these domains.
+All <b>dynamic domains</b> will point to the same dynamic IP whenever updated.
+Currently, all domains are pointed at 67.170.56.108.
+</font>
+<hr align="center" width="80%">
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2"><B>Webhop Domains:</b></font><BR><font face="Verdana, Arial, Helvetica, sans-serif" size="1">7.
+webhopdomain.com -> <input type"text" value="http://geocities.com/~username/page.html" style="font-size:10" disabled>&nbsp;[<a href="http://webhopdomain.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1044142"><B>X</B></a>]<BR><font face="Verdana, Arial, Helvetica, sans-serif" size="1">8.
+webhopdomain2.com -> <input type"text" value="http://geocities.com/~username/page.html" style="font-size:10" disabled>&nbsp;[<a href="http://webhopdomain2.com" target="new">Go</a>]</font>&nbsp;[<a href="./dns.php?action=delDomain&did=1044216"><B>X</B></a>]<BR>                </td>
+              </tr>
+              <tr>
+                <td bgcolor="#000000"><img src="images/spacer.gif" width="1" height="2"></td>
+              </tr>
+              <tr>
+                <td>
+<font face="Verdana, Arial, Helvetica, sans-serif"><b><font size="2"> Add new domain:</font></b></font>
+                  <form name="addDomain" method="get" action="./dns.php">
+<font face="Verdana, Arial, Helvetica, sans-serif" size="2">
+<b>(basic)</b><br>
+
+                    <input type="hidden" name="action" value="addDomain">
+                    <input type="text" name="newdomain" value="eg: everydns.net"><div align="right"><input type="submit" value=">> (basic)"></div>
+<b>(advanced options)</b>
+                    <div align="left"><input type="radio" name="sec" value="sec"> Make domain secondary using <input type="text" name="ns"> as master&nbsp;nameserver.</div>
+<B>OR</B><BR>
+<input type="radio" name="sec" value="dyn"> Make domain <a href="dynamic.php">dynamic</a>.
+<BR><B>OR</B><BR>
+<input type="radio" name="sec" value="webhop"> Make domain a webhop to <input type="text" name="hop" value="eg: http://geocities.com/~username/page.html">
+<div align="right"><input type="submit" value=">> (advanced)"></div>
+</font>
+                  </form>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+    <td width="70%" valign="top">
+      <table width="100%" border="0" cellspacing="0" cellpadding="1" bgcolor="#000000" align="center">
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="0" cellpadding="8" bgcolor="#FFFFFF" height="100%">
+              <tr height="100%">
+                <td bgcolor="#FFFFFF" valign="top">
+                  <div align="left">
+    <b><font face="Verdana, Arial, Helvetica, sans-serif" size="3">
+    Choose a domain to edit first.</font></b>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<!--
+<div align="center">
+<a href='http://www.ingenio.com/calls/PT_interimcall.asp?sid=5346018'><img border=0 src='http://www.ingenio.com/calls/callimage.asp?sid=5346018&ImageType=1'></a>
+</div>
+-->
+<Center>
+[ <a href="./aboutus.php">About Us</a> | 
+<a href="./news.php">News</a> | 
+<a href="./donate.php">Donate</a> | 
+<a href="./aup.php">Terms</a> | 
+<a href="http://support.everydns.com">Support</a> |
+<a href="./passwd.php">Password Reset</a> |
+<a href="http://faq.everybox.com/">FAQ</a> |
+<a href="http://david.ulevitch.com/">David Ulevitch</a> ]
+<br/>
+<br/>
+<!-- OpenDNS button -->
+<a title="Use OpenDNS to make your Internet faster, safer, and smarter." href="http://www.opendns.com/share/"><img src="http://images.opendns.com/buttons/use_opendns_155x52.gif" width="155" height="52" style="border:0;" alt="Use OpenDNS" /></a>
+<!-- / end OpenDNS button -->
+<br/></br>
+<p style="font-size: 70%; font-family: Verdana, Arial, Helvetica, sans-serif;">
+<a href="http://www.servercentral.net/" title="Hosting proudly provided by ServerCentral.Net"><img src="./images/sc.gif" border="0" style="border:0;" alt="Use ServerCentral!"></a><br/>Hosting proudly provided by <a href="http://www.servercentral.net/">ServerCentral.Net</a>
+</p>
+<!-- Start Quantcast tag -->
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script>
+<script type="text/javascript">
+_qacct="p-02sE0LJPeP85c";quantserve();</script>
+<noscript>
+<img src="http://pixel.quantserve.com/pixel/p-02sE0LJPeP85c.gif" style="display: none" height="1" width="1" alt="Quantcast"/></noscript>
+<!-- End Quantcast tag -->
+</center>
+</body>
+</html>

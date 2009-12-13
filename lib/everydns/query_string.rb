@@ -6,7 +6,7 @@ class String
   # At this point very limited in it's ability
   def decode_query_string
     self.split("&").inject({}) { |collector, string|
-      pair = string.split('=')
+      pair = string.split('=', 2)
       collector.merge({pair[0] => pair[1]})
     }
   end

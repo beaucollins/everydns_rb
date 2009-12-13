@@ -31,8 +31,28 @@ class EveryDNSTest < Test::Unit::TestCase
   
   def test_add_and_remove_domain
     client = default_client
-    client.add_domain('newtestdomainrbclient.name')
-    client.remove_domain('newtestdomainrbclient.name')
+    # Add primary
+    assert client.add_domain('newtestdomainrbclient.name')
+    assert_not_nil client.domains['newtestdomainrbclient.name'].id
+    assert client.remove_domain('newtestdomainrbclient.name')
+    
+    # Add dynamic
+    assert client.add_domain('newtestdomainrbclient.name', :dynamic)
+    assert client.domains['newtestdomainrbclient.name'].dynamic?
+    assert client.remove_domain('newtestdomainrbclient.name')
+    
+    # Add secondary
+    assert client.add_domain('newtestdomainrbclient.name', :secondary, 'primarydomain.com')
+    assert client.domains['newtestdomainrbclient.name'].secondary?
+    assert_equal client.domains['newtestdomainrbclient.name'].option, 'primarydomain.com'
+    assert client.remove_domain('newtestdomainrbclient.name')
+    
+    # Add webhop
+    assert client.add_domain('newtestdomainrbclient.name', :webhop, 'http://www.google.com')
+    assert client.domains['newtestdomainrbclient.name'].webhop?
+    assert_equal client.domains['newtestdomainrbclient.name'].option, 'http://www.google.com'
+    assert client.remove_domain('newtestdomainrbclient.name')
+    
   end
   
   protected

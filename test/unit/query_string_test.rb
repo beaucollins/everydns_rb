@@ -37,7 +37,7 @@ class QueryStringTest < Test::Unit::TestCase
   def test_decode_query_string
     
     assert_equal({'test'=>'test'}, 'test=test'.decode_query_string)
-    
+    assert_equal({'test'=>'test='}, 'test=test='.decode_query_string)
   end
   
 end

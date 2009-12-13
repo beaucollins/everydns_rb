@@ -33,6 +33,14 @@ module EveryDNS
       options.merge!({'hop' => self.option}) if self.webhop?
       options
     end
+    
+    def delete_options
+      if self.dynamic?
+        {'dynid' => self.id }
+      else
+        {'deldid' => self.id }
+      end
+    end
   
     def type_code
       {
