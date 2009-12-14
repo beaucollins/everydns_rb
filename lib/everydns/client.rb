@@ -10,15 +10,16 @@ module EveryDNS
   SESSION_TIMEOUT = 10 *60
   
   RESPONSE_MESSAGES = {
-    :LOGIN_FAILED => 'Login failed, try again!',
-    :DOMAIN_ADDED_PRIMARY => '%s has been added to the database.',
-    :DOMAIN_ADDED_DYNAMIC => '%s has been added to the database as dynamic.',
+    :LOGIN_FAILED           => 'Login failed, try again!',
+    :DOMAIN_ADDED_PRIMARY   => '%s has been added to the database.',
+    :DOMAIN_ADDED_DYNAMIC   => '%s has been added to the database as dynamic.',
     :DOMAIN_ADDED_SECONDARY => '%s has been added to the database as secondary with \'%s\' as nameserver.',
-    :DOMAIN_ADDED_WEBHOP => '%s has been added to the database as webhop.',
-    :DOMAIN_DELETED => 'Domain %s has been deleted.',
-    :DOMAIN_EXISTS => '%s already exists in database.',
-    :RECORD_DELETED => "Record Delete Succeeded",
-    :DOMAIN_LIST_RECORDS => 'Editing Domain %s.'
+    :DOMAIN_ADDED_WEBHOP    => '%s has been added to the database as webhop.',
+    :DOMAIN_DELETED         => 'Domain %s has been deleted.',
+    :DOMAIN_EXISTS          => '%s already exists in database.',
+    :DOMAIN_LIST_RECORDS    => 'Editing Domain %s.',
+    :RECORD_ADDED           => 'Added Record successfully',
+    :RECORD_DELETED         => "Record Delete Succeeded"
   }
   
   # The main interface for managing EveryDNS domains. Provide your
@@ -85,9 +86,7 @@ module EveryDNS
     def add_domain(host, type = :primary, option=nil)
       login!
       domain = Domain.new(host, nil, type, option)
-      res = post '/dns.php', {
-        'action' => 'addDomain'
-      }.merge(domain.create_options)
+      res = post '/dns.php', domain.create_options
       if response_status_message(res) == (RESPONSE_MESSAGES["DOMAIN_ADDED_#{type}".upcase.intern] % [host, option])
         list_domains
         return true
@@ -100,9 +99,7 @@ module EveryDNS
     def remove_domain(host)
       login!
       domain = @domain_list[host]
-      res = post '/dns.php', {
-        'action' => 'confDomain'
-      }.merge(domain.delete_options)
+      res = post '/dns.php', domain.delete_options
       if response_status_message(res) == (RESPONSE_MESSAGES[:DOMAIN_DELETED] % host)
         list_domains
         return true

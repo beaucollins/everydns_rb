@@ -1,5 +1,5 @@
 module EveryDNS
-  
+  require 'base64'
   class Domain
     
     attr_accessor :host, :id, :type, :option
@@ -12,6 +12,10 @@ module EveryDNS
       @option = option
       raise ArgumentError, "type must be one of: #{VALID_TYPES.join(', ')}" unless VALID_TYPES.include?(@type)
       raise ArgumentError, "option must be set if type is :secondary or :webhop" if (@option.nil? || @option.empty?) && [:webhop, :secondary].include?(@type)
+    end
+    
+    def host_base64
+      base64.encode64 if self.host
     end
     
     VALID_TYPES.each do |type|
@@ -31,7 +35,7 @@ module EveryDNS
     end
     
     def create_options
-      options = {'newdomain' => self.host }
+      options = {'action' => 'addDomain','newdomain' => self.host }
       options.merge!({'sec' => self.type_code }) unless self.primary?
       options.merge!({'ns' => self.option}) if self.secondary?
       options.merge!({'hop' => self.option}) if self.webhop?
@@ -39,11 +43,9 @@ module EveryDNS
     end
     
     def delete_options
-      if self.dynamic?
-        {'dynid' => self.id }
-      else
-        {'deldid' => self.id }
-      end
+      {'action' => 'confDomain'}.merge({
+        (self.dynamic? ? 'dynid' : 'deldid') => self.id
+      })
     end
     
     def list_records_options
