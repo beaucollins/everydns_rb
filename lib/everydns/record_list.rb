@@ -4,14 +4,29 @@ module EveryDNS
   
   class RecordList
     
-    def initialize
+    def self.parse_list(domain, html)
+      list = self.new(domain)
+      list.parse_list(html)
+      return list
+    end
+    
+    def initialize(domain)
+      raise ArgumentError "domain is not an instance of EveryDNS::Domain" unless domain.is_a?(Domain)
+      @domain = domain
       @records = []
     end
     
     Record::VALID_TYPES.each do |type|
-      define_method "#{type}".downcase do
-        @records.select { |record| record.type == type}
+      define_method "#{type}_records".downcase do
+        self.select(&"#{type}_record?".downcase.intern)
       end
+    end
+    
+    include Enumerable
+    def each
+      @records.each { |record| 
+        yield record
+      }
     end
     
     def parse_list(html)
@@ -48,9 +63,8 @@ module EveryDNS
         match.to_s.strip
       }
       if matches.length == 5
-        return Record.new(*matches.push(row_html.scan(/<a href="\.?\/dns\.php\?action=delete(Rec|DynamicRec)&(dynrid|rid)=([\d]+)[^"]+/).last))
+        return Record.new(*matches.push(row_html.scan(/<a href="\.?\/dns\.php\?action=delete(Rec|DynamicRec)&(dynrid|rid)=([\d]+)[^"]+/).last).unshift(@domain))
       end
-      matches
     end
       
   end

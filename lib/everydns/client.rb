@@ -5,6 +5,10 @@ module EveryDNS
   class MissingDomainError < StandardError; end;
   class IncorrectDomainType < StandardError; end;
   
+  EVERYDNS_HOSTNAME = 'www.everydns.com'
+  HTTP_USER_AGENT = 'RbEveryDNS'
+  SESSION_TIMEOUT = 10 *60
+  
   RESPONSE_MESSAGES = {
     :LOGIN_FAILED => 'Login failed, try again!',
     :DOMAIN_ADDED_PRIMARY => '%s has been added to the database.',
@@ -13,7 +17,8 @@ module EveryDNS
     :DOMAIN_ADDED_WEBHOP => '%s has been added to the database as webhop.',
     :DOMAIN_DELETED => 'Domain %s has been deleted.',
     :DOMAIN_EXISTS => '%s already exists in database.',
-    :RECORD_DELETED => "Record Delete Succeeded"
+    :RECORD_DELETED => "Record Delete Succeeded",
+    :DOMAIN_LIST_RECORDS => 'Editing Domain %s.'
   }
   
   # The main interface for managing EveryDNS domains. Provide your
@@ -111,19 +116,25 @@ module EveryDNS
       raise MissingDomainError, "Domain #{host} does not exist" if domain.nil?
       raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
       
+      login!
+      res = get('/dns.php', domain.list_records_options)
+      if response_status_message(res) == (RESPONSE_MESSAGES[:DOMAIN_LIST_RECORDS] % domain.host)
+        return RecordList.parse_list(domain, get(URI.join("http://#{EVERYDNS_HOSTNAME}/dns.php", res['location']).to_s).body)
+      else
+        false
+      end
     end
     
     
     def domains
-      @domain_list ||= DomainList.new
+      @domain_list ||= list_domains
     end
     
     def response_status_message(http_response)
       return false unless http_response.is_a?(Net::HTTPRedirection)
       query = URI.parse(http_response['location']).query
       return false if query.nil?
-      msg = Base64.decode64(query.decode_query_string['msg'])
-      return msg
+      return Base64.decode64(query.decode_query_string['msg'])
     end
     
     private
@@ -135,6 +146,7 @@ module EveryDNS
       
       def get path, data=nil
         @request_count += 1
+        path << "?#{data.to_query_string}" unless data.nil?
         update_cookies(http_client.get(path, prepare_headers))
       end
       

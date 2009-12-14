@@ -55,6 +55,18 @@ class EveryDNSTest < Test::Unit::TestCase
     
   end
   
+  def test_list_domains_records
+    
+    client = default_client
+    record_list = client.list_records('somewhere.com')
+    assert record_list.is_a?(EveryDNS::RecordList)
+    assert_not_nil record_list.a_records
+    assert_not_nil record_list.mx_records
+    assert_equal 1, record_list.a_records.length
+    assert_equal 1, record_list.cname_records.length
+    
+  end
+  
   protected
   
     def default_client

@@ -7,13 +7,4 @@ require 'everydns/record'
 require 'everydns/client'
 require 'everydns/query_string'
 
-module EveryDNS
-  
-  EVERYDNS_HOSTNAME = 'www.everydns.com'
-  HTTP_USER_AGENT = 'RbEveryDNS'
-  SESSION_TIMEOUT = 10 *60
-    
-end
-
-require 'uri'
 
