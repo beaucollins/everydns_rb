@@ -31,6 +31,17 @@ class RecordTest < TestCase
     }, @record.create_options)
   end
   
+  def test_delete_options
+    @record = EveryDNS::Record.new(@domain, 'sub.somewhere.com', :cname, 'google.com', '', 7200, 5)
+    assert_equal({'action' => 'deleteRec', "rid"=>'5', "domain"=>"c29tZXdoZXJlLmNvbQ==", "did"=>"1"}, @record.delete_options)
+  end
+  
+  def test_delete_options_dynamice
+    @domain = EveryDNS::Domain.new('somewhere.com', 1, :dynamic)
+    @record = EveryDNS::Record.new(@domain, 'sub.somewhere.com', :cname, 'google.com', '', 7200, 5)
+    assert_equal({'action' => 'deleteRec', "dynrid"=>'5', "domain"=>"c29tZXdoZXJlLmNvbQ==", "dynid"=>"1"}, @record.delete_options)
+  end
+  
   protected
   
     def setup

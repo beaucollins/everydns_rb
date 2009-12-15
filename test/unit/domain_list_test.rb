@@ -19,12 +19,12 @@ class DomainListTest < TestCase
     
     domain_list.each do |domain|
       assert_not_nil domain.id, "Domain #{domain.host} has a nil id"
-      assert !domain.id.empty?, "Domain #{domain.host} has an empty id"
+      assert (domain.id > 0), "Domain #{domain.host} has an empty id"
     end
     
     somewhere = domain_list['somewhere.com']
     assert_equal 'somewhere.com', somewhere.host
-    assert_equal '1043529', somewhere.id
+    assert_equal 1043529, somewhere.id
     
   end
   

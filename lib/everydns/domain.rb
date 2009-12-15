@@ -7,7 +7,7 @@ module EveryDNS
     VALID_TYPES = [:primary, :secondary, :dynamic, :webhop]
     
     def initialize(host, id=nil, type = :primary, option=nil)
-      @host, @id = host, id
+      @host, @id = host, id.to_i
       @type = type.to_sym
       @option = option
       raise ArgumentError, "type must be one of: #{VALID_TYPES.join(', ')}" unless VALID_TYPES.include?(@type)
@@ -15,7 +15,7 @@ module EveryDNS
     end
     
     def host_base64
-      base64.encode64 if self.host
+      Base64.encode64(host).strip if self.host
     end
     
     VALID_TYPES.each do |type|
@@ -27,11 +27,15 @@ module EveryDNS
     end
     
     def new?
-      id.nil?
+      id.nil? || id == 0
     end
     
     def to_s
       self.host
+    end
+    
+    def inspect
+      "<#{self.class}:#{self.object_id} %s (%s)>" % [self.host, self.id.to_s]
     end
     
     def create_options
@@ -44,7 +48,7 @@ module EveryDNS
     
     def delete_options
       {'action' => 'confDomain'}.merge({
-        (self.dynamic? ? 'dynid' : 'deldid') => self.id
+        (self.dynamic? ? 'dynid' : 'deldid') => self.id.to_s
       })
     end
     
@@ -52,12 +56,12 @@ module EveryDNS
       if self.primary?
         {
           'action' => 'editDomain',
-          'did' => self.id
+          'did' => self.id.to_s
         }
       else
         {
           'action' => 'editDynamic',
-          'dynid' => self.id
+          'dynid' => self.id.to_s
         }
       end
     end

@@ -3,6 +3,7 @@ module EveryDNS
 
   class LoginFailed < StandardError; end;
   class MissingDomainError < StandardError; end;
+  class MissingRecordError < StandardError; end;
   class IncorrectDomainType < StandardError; end;
   
   EVERYDNS_HOSTNAME = 'www.everydns.com'
@@ -42,6 +43,10 @@ module EveryDNS
       @cookie_store = Cookies::Store.new
     end
     
+    def inspect
+      "<%s %s %s>" % [self.class, self.username, (self.authenticated? ? 'authenticated' : 'unathenticated')]
+    end
+    
     # Send username/password as post data to correct url and parse
     # response for success string. Stores the PHP session cookie so
     # subsequent requests do not need to be logged in
@@ -74,6 +79,7 @@ module EveryDNS
     
     # Returns an EveryDNS::DomainList
     def list_domains
+      return @domain_list unless @domain_list.nil?
       login!
       res = get('/manage.php')
       @domain_list = DomainList.parse_list(res.body)
@@ -84,24 +90,22 @@ module EveryDNS
     #   *:dynamic
     #   *:webhop
     def add_domain(host, type = :primary, option=nil)
-      login!
       domain = Domain.new(host, nil, type, option)
+      login!
       res = post '/dns.php', domain.create_options
       if response_status_message(res) == (RESPONSE_MESSAGES["DOMAIN_ADDED_#{type}".upcase.intern] % [host, option])
-        list_domains
+        clear_domain_cache!
         return true
       else
-        puts response_status_message(res)
         return false
       end
     end
     
     def remove_domain(host)
-      login!
-      domain = @domain_list[host]
+      domain = find_domain(host)
       res = post '/dns.php', domain.delete_options
       if response_status_message(res) == (RESPONSE_MESSAGES[:DOMAIN_DELETED] % host)
-        list_domains
+        clear_domain_cache!
         return true
       else
         return false
@@ -109,23 +113,52 @@ module EveryDNS
     end
     
     def list_records(host)
-      domain = domains[host]
-      raise MissingDomainError, "Domain #{host} does not exist" if domain.nil?
+      domain = find_domain!(host)
       raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
       
-      login!
+      return @domain_records[domain.host] unless @domain_records.nil? or @domain_records[domain.host].nil?
+      
       res = get('/dns.php', domain.list_records_options)
       if response_status_message(res) == (RESPONSE_MESSAGES[:DOMAIN_LIST_RECORDS] % domain.host)
-        return RecordList.parse_list(domain, get(URI.join("http://#{EVERYDNS_HOSTNAME}/dns.php", res['location']).to_s).body)
+        record_list = RecordList.parse_list(domain, get(URI.join("http://#{EVERYDNS_HOSTNAME}/dns.php", res['location']).to_s).body)
+        cache_domain_records(domain.host, record_list)
+        return record_list
       else
-        false
+        return false
       end
     end
     
-    
-    def domains
-      @domain_list ||= list_domains
+    def add_record(domain, host, type, value, mx='', ttl=7200)
+      domain = find_domain!(domain)
+      raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
+      record = Record.new(domain, host, type, value, mx, ttl)
+      response = post('/dns.php', record.create_options)
+      if response_status_message(response) == RESPONSE_MESSAGES[:RECORD_ADDED]
+        clear_domain_records_cache!(domain)
+        true
+      else
+        false
+      end
+      
     end
+    
+    def remove_record(domain, *args)
+      domain = find_domain!(domain)
+      raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
+      record = args.first.is_a?(Record) ? record : list_records(domain)[*args]
+      raise MissingRecordError, "Record does not exist" if record.nil? || record.new?
+      
+      response = get('/dns.php', record.delete_options)
+      if response_status_message(response) == RESPONSE_MESSAGES[:RECORD_DELETED]
+        clear_domain_records_cache!(domain)
+        true
+      else
+        puts response_status_message(response)
+        false
+      end
+      
+    end
+    
     
     def response_status_message(http_response)
       return false unless http_response.is_a?(Net::HTTPRedirection)
@@ -135,6 +168,49 @@ module EveryDNS
     end
     
     private
+
+      def domains
+        @domain_list ||= list_domains
+      end
+      
+      def find_domain(host)
+        domains[host]
+      end
+      
+      def find_domain!(host)
+        return host if host.is_a?(Domain)
+        domain = find_domain(host)
+        raise MissingDomainError, "Domain #{host} does not exist" unless domain.is_a?(Domain)
+        domain
+      end
+      
+      def clear_domain_cache!
+        @domain_list = nil
+      end
+      
+      def find_domain_record(domain, *id_or_host_and_type)
+        domain_records(domain)[id_or_host_and_type]
+      end
+      
+      def domain_records(host)
+        host = domain.host if host.is_a?(Domain)
+        return @domain_records[domain] if @domain_records && @domain_records.key?(domain)
+        @domain_records = Hash.new if @domain_records.nil?
+        records = list_records(host)
+        @domain_records.merge!(host => records)
+        records
+      end
+      
+      def clear_domain_records_cache!(host)
+        host = host.host if host.is_a?(Domain)
+        return if @domain_records.nil?
+        @domain_records.delete host
+      end
+      
+      def cache_domain_records(host, record_list)
+        @domain_records = Hash.new if @domain_records.nil?
+        @domain_records[host] = record_list
+      end
       
       def post path, data
         @request_count += 1

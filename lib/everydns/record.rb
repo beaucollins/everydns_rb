@@ -22,9 +22,17 @@ module EveryDNS
       @type = type.to_s.upcase.intern
       @mx = mx
       @ttl = ttl
-      @id = rid
+      @id = rid.to_i
       raise ArgumentError, "Invalid type \"#{type}\", valid types are #{VALID_TYPES.join(', ')}" unless VALID_TYPES.include?(@type)
       raise ArgumentError, "Records of type \"#{type}\" must provide and mx value" if @type == :MX && @mx.empty?
+    end
+    
+    def new?
+      id.nil? || id == 0
+    end
+    
+    def inspect
+      '<%s:%i %s %s (%s)>' % [self.class, object_id, self.host, self.type, self.id]
     end
     
     VALID_TYPES.each do |type|
@@ -50,14 +58,16 @@ module EveryDNS
     def delete_options
       if domain.primary?
         {
-          'rid' => self.id,
-          'did' => domain.id,
+          'action' => 'deleteRec',
+          'rid' => self.id.to_s,
+          'did' => domain.id.to_s,
           'domain' => domain.host_base64
         }
       else
         {
-          'dynrid' => self.id,
-          'dynid' => domain.id,
+          'action' => 'deleteRec',
+          'dynrid' => self.id.to_s,
+          'dynid' => domain.id.to_s,
           'domain' => domain.host_base64
         }
       end

@@ -3,6 +3,11 @@ require 'test_helper'
 class DomainTest < TestCase
   include EveryDNS
     
+  def test_base64
+    domain = Domain.new('google.com')
+    assert_equal "Z29vZ2xlLmNvbQ==", domain.host_base64
+  end
+    
   def test_primary_domain
     domain = Domain.new('www.google.com')
     assert_equal domain.host, 'www.google.com'
@@ -12,6 +17,14 @@ class DomainTest < TestCase
       'action'    => 'addDomain',
       'newdomain' => 'www.google.com'
     }, domain.create_options)
+  end
+  
+  def test_primary_delete_options
+    domain = Domain.new('www.google.com', 1, :primary)
+    assert_equal({
+      'action'  => 'confDomain',
+      'deldid'     => '1'
+    }, domain.delete_options)
   end
   
   def test_secondary_domain
@@ -35,6 +48,14 @@ class DomainTest < TestCase
     }, domain.create_options)
   end
   
+  def test_dynamic_delete_options
+    domain = Domain.new('www.google.com', 1, :dynamic)
+    assert_equal({
+      'action'  => 'confDomain',
+      'dynid'   => '1'
+    }, domain.delete_options)
+  end
+
   def test_webhop_domain
     domain = Domain.new('webhop.com', nil, :webhop, 'http://www.geocities.com/name')
     assert_equal({

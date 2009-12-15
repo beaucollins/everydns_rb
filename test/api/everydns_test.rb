@@ -33,24 +33,24 @@ class EveryDNSTest < Test::Unit::TestCase
     client = default_client
     # Add primary
     assert client.add_domain('newtestdomainrbclient.name')
-    assert_not_nil client.domains['newtestdomainrbclient.name'].id
+    assert_not_nil client.list_domains['newtestdomainrbclient.name'].id
     assert client.remove_domain('newtestdomainrbclient.name')
     
     # Add dynamic
     assert client.add_domain('newtestdomainrbclient.name', :dynamic)
-    assert client.domains['newtestdomainrbclient.name'].dynamic?
+    assert client.list_domains['newtestdomainrbclient.name'].dynamic?
     assert client.remove_domain('newtestdomainrbclient.name')
     
     # Add secondary
     assert client.add_domain('newtestdomainrbclient.name', :secondary, 'primarydomain.com')
-    assert client.domains['newtestdomainrbclient.name'].secondary?
-    assert_equal client.domains['newtestdomainrbclient.name'].option, 'primarydomain.com'
+    assert client.list_domains['newtestdomainrbclient.name'].secondary?
+    assert_equal client.list_domains['newtestdomainrbclient.name'].option, 'primarydomain.com'
     assert client.remove_domain('newtestdomainrbclient.name')
     
     # Add webhop
     assert client.add_domain('newtestdomainrbclient.name', :webhop, 'http://www.google.com')
-    assert client.domains['newtestdomainrbclient.name'].webhop?
-    assert_equal client.domains['newtestdomainrbclient.name'].option, 'http://www.google.com'
+    assert client.list_domains['newtestdomainrbclient.name'].webhop?
+    assert_equal client.list_domains['newtestdomainrbclient.name'].option, 'http://www.google.com'
     assert client.remove_domain('newtestdomainrbclient.name')
     
   end
@@ -64,6 +64,16 @@ class EveryDNSTest < Test::Unit::TestCase
     assert_not_nil record_list.mx_records
     assert_equal 1, record_list.a_records.length
     assert_equal 1, record_list.cname_records.length
+    
+  end
+  
+  def test_add_and_remove_record
+    client = default_client
+    assert client.add_record('somewhere.com', 'test.somewhere.com', :CNAME, 'google.com')
+    assert client.list_records('somewhere.com').collect(&:host).include?('test.somewhere.com')
+    record = client.list_records('somewhere.com')['test.somewhere.com', :CNAME]
+    assert !record.new?
+    assert client.remove_record('somewhere.com', record.id)
     
   end
   

@@ -28,3 +28,9 @@ class Hash
     }.join("&")
   end
 end
+
+class Object
+  def to_query_string(scope='')
+    self.to_s.to_query_string(scope)
+  end
+end

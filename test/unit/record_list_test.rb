@@ -16,6 +16,20 @@ class RecordListTest < TestCase
     
   end
   
+  def test_search_list
+    record_list = EveryDNS::RecordList.parse_list(@domain, File.read('test/fixtures/record_list.html'))
+    
+    assert record_list.mx_records
+    assert_equal Array, record_list['www.someawesomedomain.name'].class
+    assert_equal 1, record_list['www.someawesomedomain.name'].length
+    
+    assert_equal EveryDNS::Record, record_list['www.someawesomedomain.name', :CNAME].class
+    assert_equal 5759182, record_list['www.someawesomedomain.name', :CNAME].id
+    
+    assert_equal EveryDNS::Record, record_list[5759182].class
+    
+  end
+  
   def setup
     @domain = EveryDNS::Domain.new('google.com', nil, :primary)
   end

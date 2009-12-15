@@ -22,6 +22,24 @@ module EveryDNS
       end
     end
     
+    def [](*args)
+      
+      return detect { |record| record.id == args.first  } if args.first.is_a?(Integer)
+      return select { |record| record.host =~ args.first } if args.first.is_a?(Regexp)
+      
+      type = args.first if args.length == 1 && args.first.is_a?(Symbol)
+      type = args.last if (args.length == 2)
+      host = args.first if args.length == 1 && args.first.is_a?(String) 
+      host = args.first if (args.length == 2)
+      
+      if host && type
+        detect {|record| record.host == host && record.type == type}
+      else
+        select {|record| record.host == host || record.type == type}
+      end
+      
+    end
+    
     include Enumerable
     def each
       @records.each { |record| 
@@ -63,7 +81,7 @@ module EveryDNS
         match.to_s.strip
       }
       if matches.length == 5
-        return Record.new(*matches.push(row_html.scan(/<a href="\.?\/dns\.php\?action=delete(Rec|DynamicRec)&(dynrid|rid)=([\d]+)[^"]+/).last).unshift(@domain))
+        return Record.new(*matches.push(row_html.scan(/<a href="\.?\/dns\.php\?action=delete(Rec|DynamicRec)&(dynrid|rid)=([\d]+)[^"]+/).last.last).unshift(@domain))
       end
     end
       
