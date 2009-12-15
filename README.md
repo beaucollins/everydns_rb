@@ -6,6 +6,15 @@ HTML scraping to communicate with EveryDNS.
 Currently supports the adding and removing of domains with A, CNAME, NS, MX,
 TXT, AAAA records (only those who have donated to EveryDNS can add TXT records).
 
+## Install
+
+Sorry, not yet packaged up as a gem:
+
+    git clone git://github.com/beaucollins/everydns_rb.git
+    cd everydns_rb/lib
+    irb -r everydns
+    
+
 ## Example:
 
     require 'everydns'
