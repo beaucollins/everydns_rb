@@ -1,3 +1,5 @@
+# These monkey patches help create querystrings from String, Hash and Array 
+# objects.
 class String
   def to_query_string(scope='')
     URI.escape(scope.empty? ? self.to_s : "#{scope}=#{self.to_s}")

@@ -9,13 +9,18 @@ module EveryDNS
   DYNAMIC_REGEX = /<a href='(\.\/)?dns\.php\?action=editDynamic&dynid=([\d]+)'[^>]*>([^<]+)<\/a>/
   WEBHOP_REGEX = /^(.*) -> <input type=?"text" value="([^"]+)"(.*)\[<a href="\.\/dns\.php\?action=delDomain&did=([\d]+)"/
   
+  # Represents the list of domains managed by a single EveryDNS account. Returned
+  # by EveryDNS::Client#list_domains. Provides some convenience methods to filter
+  # domains by type (primary, secondary, dynamic and webhop).
   class DomainList    
       
     attr_reader :domains
     
-    def self.parse_list(string)
+    # Given a string of HTML from EveryDNS parses out the list of domains and
+    # necessary attributes to construct all of the EveryDNS::Domain objects
+    def self.parse_list(html)
       list = self.new
-      list.parse_list(string)
+      list.parse_list(html)
       list
     end
     

@@ -1,7 +1,8 @@
 require 'everydns/record'
 
 module EveryDNS
-  
+  # Parses out a list of EveryDNS::Records given a EveryDNS::Domain and a string
+  # of HTML.
   class RecordList
     
     def self.parse_list(domain, html)
@@ -10,6 +11,7 @@ module EveryDNS
       return list
     end
     
+    # When constructing a RecordList you must provide the EveryDNS::Domain
     def initialize(domain)
       raise ArgumentError "domain is not an instance of EveryDNS::Domain" unless domain.is_a?(Domain)
       @domain = domain
@@ -22,6 +24,11 @@ module EveryDNS
       end
     end
     
+    # Filter records:
+    #   [24]                    # record with same id or nil
+    #   ['sub.host.com']        # array of records with matching host
+    #   ['sub.host.com', :MX]   # record matching host and type or nil
+    #   [/*\.host\.com/]        # all records whose host matches regex
     def [](*args)
       
       return detect { |record| record.id == args.first  } if args.first.is_a?(Integer)
@@ -41,6 +48,7 @@ module EveryDNS
     end
     
     include Enumerable
+    # Enumerates with each record
     def each
       @records.each { |record| 
         yield record

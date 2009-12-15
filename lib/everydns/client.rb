@@ -1,15 +1,22 @@
 require 'everydns/cookies'
 module EveryDNS
 
+  # Username and password were incorrect
   class LoginFailed < StandardError; end;
+  # A requested EveryDNS::Domain did not exist when asked to perform an action
   class MissingDomainError < StandardError; end;
+  # A requrested EveryDNS::Record was missing when asked to perform an action
   class MissingRecordError < StandardError; end;
+  # Specific EveryDNS::Domain types can have DNS records associated with them
   class IncorrectDomainType < StandardError; end;
   
   EVERYDNS_HOSTNAME = 'www.everydns.com'
   HTTP_USER_AGENT = 'RbEveryDNS'
   SESSION_TIMEOUT = 10 *60
   
+  # These messages are returned as query string variables in HTTP redirect
+  # responses. They are used to confirm the successfull completion of a 
+  # request
   RESPONSE_MESSAGES = {
     :LOGIN_FAILED           => 'Login failed, try again!',
     :DOMAIN_ADDED_PRIMARY   => '%s has been added to the database.',
@@ -25,6 +32,9 @@ module EveryDNS
   
   # The main interface for managing EveryDNS domains. Provide your
   # username and password to the client then perform desired rquests.
+  # 
+  # Inteligently caches authentication and other commands to help reduce
+  # the amount of HTTP requests to perform
   class Client
     require 'base64'
     require 'net/http'
@@ -32,6 +42,8 @@ module EveryDNS
     
     attr_reader :username, :password, :request_count
     
+    # Create an instance of the client using the provided username and password
+    # to authenticate
     def initialize(username, password)
       @username = username
       @password = password
@@ -67,6 +79,7 @@ module EveryDNS
       end
     end
     
+    # Login raising LoginFailed error if unsuccessful
     def login!
       raise LoginFailed, 'Could not login with provided username and password' if !self.login
       return @last_login
@@ -86,9 +99,14 @@ module EveryDNS
     end
     
     # Add a host as a domain managed by EveryDNS. Options:
-    #   *:secondary
-    #   *:dynamic
-    #   *:webhop
+    # 
+    # Types:
+    #   * :secondary
+    #   * :dynamic
+    #   * :webhop
+    # 
+    # When secondary <tt>option</tt> is the primary domain, and when webhop
+    # is the address of the destination url. Otherwise not needed.
     def add_domain(host, type = :primary, option=nil)
       domain = Domain.new(host, nil, type, option)
       login!
@@ -101,8 +119,11 @@ module EveryDNS
       end
     end
     
+    # Removes the requested domain from the EveryDNS account:
+    #   remove_domain('domain.com')   # deletes domain.com and DNS records
+    #   list_domains                  # domain.com is now gone
     def remove_domain(host)
-      domain = find_domain(host)
+      domain = find_domain!(host)
       res = post '/dns.php', domain.delete_options
       if response_status_message(res) == (RESPONSE_MESSAGES[:DOMAIN_DELETED] % host)
         clear_domain_cache!
@@ -112,6 +133,15 @@ module EveryDNS
       end
     end
     
+    # Returns an EveryDNS::RecordList for the given host:
+    # 
+    #   records = list_records 'domain.com'   # > EveryDNS::RecordList
+    #   records[:MX]                          # Array of all MX records
+    #   records.each do |record|              # Iterates with EveryDNS::Record
+    #   puts record.host
+    #   puts record.value
+    #   end
+    # 
     def list_records(host)
       domain = find_domain!(host)
       raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
@@ -128,10 +158,16 @@ module EveryDNS
       end
     end
     
-    def add_record(domain, host, type, value, mx='', ttl=7200)
+    # Adds a DNS record for specified domain
+    # 
+    # add_record 'domain.com', 'domain.com', :A, '192.168.0.1
+    # add_record 'domain.com', 'www.domain.com', :CNAME, 'domain.com'
+    # add_record 'domain.com', 'mail.domain.com', :MX, 10
+    # 
+    def add_record(domain, host, type, value, mx_priority='', ttl=7200)
       domain = find_domain!(domain)
       raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
-      record = Record.new(domain, host, type, value, mx, ttl)
+      record = Record.new(domain, host, type, value, mx_priority, ttl)
       response = post('/dns.php', record.create_options)
       if response_status_message(response) == RESPONSE_MESSAGES[:RECORD_ADDED]
         clear_domain_records_cache!(domain)
@@ -142,6 +178,14 @@ module EveryDNS
       
     end
     
+    # Deletes a given record, must provide the domain as well as combination of
+    # 
+    # * The EveryDNS::Record <tt>id</tt>
+    # * The host and type e.g.
+    # 
+    #   remove_record 'domain.com', 145698
+    #   remove_record 'domain.com', 'mail.domain.com', :MX
+    # 
     def remove_record(domain, *args)
       domain = find_domain!(domain)
       raise IncorrectDomainType, "Domain #{host} is a #{domain.type} domain" unless domain.can_have_records?
@@ -159,7 +203,11 @@ module EveryDNS
       
     end
     
-    
+    # Parses the reponse message from the querystring of a Net::HTTPRedirection
+    # response from everydns.com
+    # 
+    # The messages are stored in the query string variable <tt>msg</tt> and
+    # are encoded using Base64
     def response_status_message(http_response)
       return false unless http_response.is_a?(Net::HTTPRedirection)
       query = URI.parse(http_response['location']).query

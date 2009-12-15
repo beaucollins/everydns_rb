@@ -1,5 +1,7 @@
 module EveryDNS
 
+  # An extremely basic cookie store used primarily to store the PHP session
+  # used for authentication at everydns.com
   module Cookies
     
     class Store

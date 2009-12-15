@@ -3,6 +3,8 @@ require 'test_helper'
 USERNAME = 'rb_client'
 PASSWORD = 'rb_client_test'
 
+# This test actually runs agains the live server. Not ideal but trying to keep
+# it limited
 class EveryDNSTest < Test::Unit::TestCase
   
   def test_sanity_check

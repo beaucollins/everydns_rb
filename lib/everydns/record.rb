@@ -1,5 +1,6 @@
 module EveryDNS
-  
+  # A DNS records associated with a domain managed by EveryDNS. Interacting
+  # with this class will be done mainly through the EveryDNS::Client class.
   class Record
     
     VALID_TYPES = [:A, :CNAME, :NS, :MX, :TXT, :AAAA]
@@ -14,6 +15,8 @@ module EveryDNS
     
     attr_reader :domain, :host, :type, :value, :mx, :ttl, :id
     
+    # Constructs the record. Do not construct this class directly, instead use
+    # EveryDNS::Client to manage EveryDNS::Record objects
     def initialize(domain, host, type, value, mx='', ttl=7200, rid=nil)
       raise ArgumentError, "domain must be an instance of EveryDNS::Domain" unless domain.is_a? EveryDNS::Domain
       @domain = domain
@@ -27,6 +30,7 @@ module EveryDNS
       raise ArgumentError, "Records of type \"#{type}\" must provide and mx value" if @type == :MX && @mx.empty?
     end
     
+    # A record is new when it doesn't not have an id from EveryDNS
     def new?
       id.nil? || id == 0
     end
@@ -41,6 +45,7 @@ module EveryDNS
       end
     end
     
+    # Post options used to create DNS records in HTTP requests with everydns.com
     def create_options
       {
         'action' => "add#{"Dynamic" if domain.dynamic?}Record",
@@ -55,6 +60,7 @@ module EveryDNS
       })
     end
     
+    # Post options used to delete DNS records in HTTP requests with everydns.com
     def delete_options
       if domain.primary?
         {
